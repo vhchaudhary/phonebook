@@ -1,0 +1,40 @@
+{% load staticfiles %}
+<html>
+
+<head>
+    <title>Contacts</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+
+</head>
+
+<body>
+
+    <div class="row">
+        <div class="col-md-11"/>
+        <div class="col-md-1 pull-right" style="margin-top:10px;">
+            <a href="{% url 'phone_book:logout' %}" class="btn btn-sm btn-secondary">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+
+        {% block content %}
+
+        {% endblock %}
+
+
+    </div>
+
+
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

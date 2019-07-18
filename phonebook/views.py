@@ -1,0 +1,213 @@
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.http import JsonResponse
+from django.views.generic import CreateView, UpdateView
+from .forms import *
+from django.db import transaction
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+
+class ContactDetails(LoginRequiredMixin, CreateView):
+    model = Contact
+    template_name = 'phonebook/contact_data.html'
+    form_class = ContactForm
+    success_url = None
+    login_url = '/logins/'
+
+    def get_context_data(self, **kwargs):
+        contacts = Contact.objects.all()
+        contact_data = [
+            {
+                'id': c.id,
+                'name': c.fname + ' ' + (c.lname if c.lname else ''),
+                'email': c.email if c.email else False,
+                'is_favourite': c.is_favourite,
+                'ph_numbers': [cn.number for cn in ContactNo.objects.filter(contact_id=c.id)]
+            }
+            for c in contacts
+        ]
+        kwargs.update({'data': contact_data})
+        data = super(ContactDetails, self).get_context_data(**kwargs)
+        if self.request.POST:
+            data['contacts'] = ContactNoFormSet(self.request.POST)
+        else:
+            data['contacts'] = ContactNoFormSet()
+        return data
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        numbers = context['contacts']
+        with transaction.atomic():
+            form.instance.created_by = self.request.user
+            self.object = form.save()
+            if numbers.is_valid():
+                numbers.instance = self.object
+                numbers.save()
+        return super(ContactDetails, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('phone_book:contact_details')
+
+
+class ContactUpdate(UpdateView):
+    model = Contact
+    template_name = 'phonebook/contact_data.html'
+    form_class = ContactForm
+    success_url = None
+
+    def get_context_data(self, **kwargs):
+        contacts = Contact.objects.all()
+        contact_data = [
+            {
+                'id': c.id,
+                'name': c.fname + ' ' + (c.lname if c.lname else ''),
+                'email': c.email,
+                'is_favourite': c.is_favourite,
+                'ph_numbers': [cn.number for cn in ContactNo.objects.filter(contact_id=c.id)]
+            }
+            for c in contacts
+        ]
+        kwargs.update({'data': contact_data})
+        data = super(ContactUpdate, self).get_context_data(**kwargs)
+        if self.request.POST:
+            data['contacts'] = ContactNoFormSet(self.request.POST, instance=self.object)
+        else:
+            data['contacts'] = ContactNoFormSet(instance=self.object)
+        return data
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        numbers = context['contacts']
+        with transaction.atomic():
+            form.instance.created_by = self.request.user
+            self.object = form.save()
+            if numbers.is_valid():
+                numbers.instance = self.object
+                numbers.save()
+        return super(ContactUpdate, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('phone_book:contact_data', kwargs={'pk': self.object.pk})
+
+
+def logins(request):
+    if request.user.id and request.user.is_authenticated:
+        return redirect('phone_book:contact_details')
+    elif request.method == 'POST':
+        login_form = LoginForm(request.POST)
+        if login_form.is_valid():
+            user = authenticate(username=login_form.cleaned_data['email'], password=login_form.cleaned_data['password'])
+            if user:
+                login(request, user)
+                return redirect('phone_book:contact_details')
+            else:
+                return redirect('phone_book:login')
+    else:
+        login_form = LoginForm()
+        return render(request, 'phonebook/login.html', {'form': login_form})
+
+
+def log_out(request):
+    logout(request)
+    return redirect('phone_book:login')
+
+
+@login_required
+def delete_contact(request, id):
+    contact = Contact.objects.get(pk=id)
+    contact.delete()
+    return JsonResponse({'success': True})
+
+
+@login_required
+def toggle_favourite(request, id):
+    contact = Contact.objects.get(pk=id)
+    contact.is_favourite = not contact.is_favourite
+    contact.save()
+    return JsonResponse({'success': True, 'fav_value': contact.is_favourite})
+
+
+def contact_data(request):
+    if request.method == "POST":
+        contact_form = ContactForm(request.POST)
+        contact_no_form = ContactNoForm(request.POST)
+        if contact_form.is_valid() and contact_no_form.is_valid():
+            fname = contact_form.cleaned_data.get('fname')
+            lname = contact_form.cleaned_data.get('lname')
+            nick_name = contact_form.cleaned_data.get('nick_name')
+            email = contact_form.cleaned_data.get('email')
+            website = contact_form.cleaned_data.get('website')
+            company_name = contact_form.cleaned_data.get('company_name')
+            bdate = contact_form.cleaned_data.get('bdate')
+
+            number = contact_no_form.cleaned_data.get('number')
+            number_type = contact_no_form.cleaned_data.get('number_type')
+
+            contact = Contact.objects.create(fname=fname, lname=lname, nick_name=nick_name, email=email,
+                                             website=website, company_name=company_name, bdate=bdate)
+
+            ContactNo.objects.create(number=number, number_type=number_type, contact_id=contact)
+
+    contact_form = ContactForm()
+    contact_no_form = ContactNoForm()
+
+    contacts = Contact.objects.all()
+    contact_data = [
+        {
+            'id': c.id,
+            'name': c.fname + ' ' + (c.lname if c.lname else ''),
+            'email': c.email,
+            'is_favourite': c.is_favourite,
+            'ph_numbers': [cn.number for cn in ContactNo.objects.filter(contact_id=c.id)]
+        }
+        for c in contacts
+    ]
+
+    return render(request, 'phonebook/contact_data.html', {'contacts': contact_data, 'contact_form': contact_form,
+                                                           'contact_no_form': contact_no_form})
+
+
+def update_contact_modal(request, id):
+    contact = Contact.objects.get(pk=id)
+    number = ContactNo.objects.filter(contact_id=contact.id).first()
+
+    data = {
+        'id': contact.id,
+        'fname': contact.fname,
+        'lname': contact.lname,
+        'email': contact.email,
+        'bdate': contact.bdate,
+        'company_name': contact.company_name,
+        'website': contact.website,
+        'number': number.number,
+        'number_type': number.number_type,
+    }
+    return JsonResponse({'data': data, 'success': True})
+
+
+def update_contact(request):
+    if request.method == 'POST':
+        contact_form = ContactForm(request.POST)
+        contact_no_form = ContactNoForm(request.POST)
+
+        if contact_form.is_valid() and contact_no_form.is_valid():
+            contact = Contact.objects.get(pk=request.POST.get('id'))
+            number = ContactNo.objects.filter(contact_id=contact.id).first()
+
+            contact.fname = contact_form.cleaned_data.get('fname')
+            contact.lname = contact_form.cleaned_data.get('lname')
+            contact.nick_name = contact_form.cleaned_data.get('nick_name')
+            contact.email = contact_form.cleaned_data.get('email')
+            contact.website = contact_form.cleaned_data.get('website')
+            contact.company_name = contact_form.cleaned_data.get('company_name')
+            contact.bdate = contact_form.cleaned_data.get('bdate')
+
+            number.number = contact_no_form.cleaned_data.get('number')
+            number.number_type = contact_no_form.cleaned_data.get('number_type')
+
+            contact.save()
+            number.save()
+
+        return redirect('contact_data')
