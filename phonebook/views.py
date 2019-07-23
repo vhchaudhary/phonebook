@@ -7,6 +7,7 @@ from .forms import *
 from django.db import transaction
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
+from .document import *
 
 
 class ContactDetails(LoginRequiredMixin, CreateView):
@@ -110,12 +111,13 @@ def logins(request):
 
 
 def log_out(request):
-    logout(request)
+    logout(request) # It will logout user and clear current login sessions
     return redirect('phone_book:login')
 
 
 @login_required
 def delete_contact(request, id):
+    """ This method use for delete contact to favourite and its request type is AJAX """
     contact = Contact.objects.get(pk=id)
     contact.delete()
     return JsonResponse({'success': True})
@@ -123,6 +125,7 @@ def delete_contact(request, id):
 
 @login_required
 def toggle_favourite(request, id):
+    """ This method use for add contact to favourite and its request type is AJAX """
     contact = Contact.objects.get(pk=id)
     contact.is_favourite = not contact.is_favourite
     contact.save()
@@ -169,45 +172,3 @@ def contact_data(request):
                                                            'contact_no_form': contact_no_form})
 
 
-def update_contact_modal(request, id):
-    contact = Contact.objects.get(pk=id)
-    number = ContactNo.objects.filter(contact_id=contact.id).first()
-
-    data = {
-        'id': contact.id,
-        'fname': contact.fname,
-        'lname': contact.lname,
-        'email': contact.email,
-        'bdate': contact.bdate,
-        'company_name': contact.company_name,
-        'website': contact.website,
-        'number': number.number,
-        'number_type': number.number_type,
-    }
-    return JsonResponse({'data': data, 'success': True})
-
-
-def update_contact(request):
-    if request.method == 'POST':
-        contact_form = ContactForm(request.POST)
-        contact_no_form = ContactNoForm(request.POST)
-
-        if contact_form.is_valid() and contact_no_form.is_valid():
-            contact = Contact.objects.get(pk=request.POST.get('id'))
-            number = ContactNo.objects.filter(contact_id=contact.id).first()
-
-            contact.fname = contact_form.cleaned_data.get('fname')
-            contact.lname = contact_form.cleaned_data.get('lname')
-            contact.nick_name = contact_form.cleaned_data.get('nick_name')
-            contact.email = contact_form.cleaned_data.get('email')
-            contact.website = contact_form.cleaned_data.get('website')
-            contact.company_name = contact_form.cleaned_data.get('company_name')
-            contact.bdate = contact_form.cleaned_data.get('bdate')
-
-            number.number = contact_no_form.cleaned_data.get('number')
-            number.number_type = contact_no_form.cleaned_data.get('number_type')
-
-            contact.save()
-            number.save()
-
-        return redirect('contact_data')

@@ -18,9 +18,10 @@ class LoginForm(forms.ModelForm):
 
 
 class ContactForm(forms.ModelForm):
-    bdate = forms.DateField(label='Birth Date', required=False, widget=forms.TextInput(attrs={
-        'type': 'date',
-    }))
+    bdate = forms.DateField(label='Birth Date', required=False, widget=forms.TextInput(
+        attrs={
+            'type': 'date',
+        })) # Require to show date widget in form
 
     class Meta:
         model = Contact
@@ -29,26 +30,7 @@ class ContactForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ContactForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
-        # self.helper.form_tag = True
-        # self.helper.form_class = 'form-horizontal'
-        # self.helper.label_class = 'col-md-3 create-label'
-        # self.helper.field_class = 'col-md-8'
-        # self.helper.layout = Layout(
-        #     Div(
-        #         Field('fname'),
-        #         Field('lname'),
-        #         Field('email'),),
-        #     Div(
-        #         Field('bdate'),
-        #         Field('company_name'),
-        #         Field('website'),
-        #         Fieldset('Add Contacts',
-        #                  Formset('contacts')),
-        #         HTML("<br>"),
-        #         ButtonHolder(Submit('submit', 'save')),
-        #     )
-        # )
-
+        # form helper use for custom designing and add bootstrap classes dynamiccaly into forms after render into html
         self.helper.layout = Layout(
             Row(
                 Column('fname', css_class='form-group col-md-6 mb-0'),
@@ -56,11 +38,12 @@ class ContactForm(forms.ModelForm):
                 css_class='form-row'
             ),
             Row(
+                Column('email', css_class='form-group col-md-6 mb-0'),
                 Column('bdate', css_class='form-group col-md-6 mb-0'),
-                Column('company_name', css_class='form-group col-md-6 mb-0'),
                 css_class='form-row'
             ),
             Row(
+                Column('company_name', css_class='form-group col-md-6 mb-0'),
                 Column('website', css_class='form-group col-md-6 mb-0'),
                 css_class='form-row'
             ),
@@ -72,7 +55,7 @@ class ContactForm(forms.ModelForm):
 class ContactNoForm(forms.ModelForm):
     class Meta:
         model = ContactNo
-        exclude = ()
+        exclude = () # we can also use fields = '__all__'
 
 
 ContactNoFormSet = inlineformset_factory(
@@ -85,4 +68,3 @@ class AddressForm(forms.ModelForm):
     class Meta:
         model = Address
         exclude = ['contact_id']
-

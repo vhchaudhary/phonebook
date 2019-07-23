@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'crispy_forms',
     'social_django',
+    'django_elasticsearch_dsl',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -70,6 +71,16 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
+
+ELASTICSEARCH_DSL={
+    'default': {
+        'hosts': 'localhost:9200'
+    },
+}
+
+ELASTICSEARCH_DSL_INDEX_SETTINGS = {
+    'number_of_shards': 1
+}
 
 ROOT_URLCONF = 'PhoneBook.urls'
 
