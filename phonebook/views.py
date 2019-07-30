@@ -23,7 +23,7 @@ class ContactDetails(LoginRequiredMixin, CreateView):
             {
                 'id': c.id,
                 'name': c.fname + ' ' + (c.lname if c.lname else ''),
-                'email': c.email if c.email else False,
+                'email': c.email if c.email else '-',
                 'is_favourite': c.is_favourite,
                 'ph_numbers': [cn.number for cn in ContactNo.objects.filter(contact_id=c.id)]
             }
@@ -64,7 +64,7 @@ class ContactUpdate(UpdateView):
             {
                 'id': c.id,
                 'name': c.fname + ' ' + (c.lname if c.lname else ''),
-                'email': c.email,
+                'email': c.email if c.email else '-',
                 'is_favourite': c.is_favourite,
                 'ph_numbers': [cn.number for cn in ContactNo.objects.filter(contact_id=c.id)]
             }

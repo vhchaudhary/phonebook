@@ -59,8 +59,11 @@ MIDDLEWARE = [
 # SOCIAL_AUTH_URL_NAMESPACE = 'social'
 
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = ''
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = ''
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '634544027010-kcu8rd7ecg2paqfbie1cne7il5d3vghi.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'YRsCIRQz3BEHgbSjcnxMB7bT'
+
+SOCIAL_AUTH_LINKEDIN_KEY = ''
+SOCIAL_AUTH_LINKEDIN_SECRET = ''
 
 LOGIN_REDIRECT_URL = '/all/'
 LOGOUT_URL = '/logins/'
@@ -68,6 +71,7 @@ LOGOUT_URL = '/logins/'
 
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.google.GoogleOAuth2',
+    # 'social.backends.linkedin.LinkedinOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
 
@@ -76,10 +80,6 @@ ELASTICSEARCH_DSL={
     'default': {
         'hosts': 'localhost:9200'
     },
-}
-
-ELASTICSEARCH_DSL_INDEX_SETTINGS = {
-    'number_of_shards': 1
 }
 
 ROOT_URLCONF = 'PhoneBook.urls'

@@ -1,15 +1,7 @@
 
 $(document).ready(function(){
 
-    $('.example-the-2').on('click', function(){
-        $.confirm({
-            icon: 'fa fa-question-circle-o',
-            theme: 'supervan',
-            closeIcon: true,
-            animation: 'scale',
-            type: 'orange',
-        });
-    });
+    $('#contact_table').DataTable();
 
     $(document).on("click", "a[name='a_fav']", function(e){
         e.preventDefault();

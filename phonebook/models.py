@@ -21,7 +21,7 @@ class ContactNo(TimeStampedModel):
     number = models.CharField(max_length=13)
     number_type = models.CharField(choices=[('mobile', 'Mobile'), ('tel', 'Telephone'), ('fax', 'Fax')],
                                    max_length=6, default='mobile')
-    contact_id = models.ForeignKey(Contact, on_delete=models.CASCADE, null=True, blank=True)
+    contact_id = models.ForeignKey(Contact, on_delete=models.CASCADE, related_name='number_ids', null=True, blank=True)
 
     def __str__(self):
         return self.contact_id.fname + ' - '+ self.number
