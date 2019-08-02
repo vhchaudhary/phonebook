@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'social_django',
     'django_elasticsearch_dsl',
+    'behaviors.apps.BehaviorsConfig',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

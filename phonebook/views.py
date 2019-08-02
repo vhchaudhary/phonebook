@@ -1,3 +1,5 @@
+
+import vobject
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
@@ -18,7 +20,7 @@ class ContactDetails(LoginRequiredMixin, CreateView):
     login_url = '/logins/'
 
     def get_context_data(self, **kwargs):
-        contacts = Contact.objects.all()
+        contacts = ContactDocument.search(index='contacts').scan()
         contact_data = [
             {
                 'id': c.id,
@@ -59,7 +61,7 @@ class ContactUpdate(UpdateView):
     success_url = None
 
     def get_context_data(self, **kwargs):
-        contacts = Contact.objects.all()
+        contacts = ContactDocument.search(index='contacts').scan()
         contact_data = [
             {
                 'id': c.id,
@@ -90,7 +92,7 @@ class ContactUpdate(UpdateView):
         return super(ContactUpdate, self).form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy('phone_book:contact_data', kwargs={'pk': self.object.pk})
+        return reverse_lazy('phone_book:contact_details', kwargs={'pk': self.object.pk})
 
 
 def logins(request):
@@ -111,7 +113,7 @@ def logins(request):
 
 
 def log_out(request):
-    logout(request) # It will logout user and clear current login sessions
+    logout(request)  # It will logout user and clear current login sessions
     return redirect('phone_book:login')
 
 
@@ -130,6 +132,51 @@ def toggle_favourite(request, id):
     contact.is_favourite = not contact.is_favourite
     contact.save()
     return JsonResponse({'success': True, 'fav_value': contact.is_favourite})
+
+
+def delete_multi(request):
+    if request.POST and request.is_ajax:
+        contact_ids = dict(request.POST).get("ids[]")
+        contacts = Contact.objects.filter(pk__in=contact_ids)
+        print("Contacts", [c.fname for c in contacts])
+        # contacts.delete()
+        return JsonResponse({"success": True, "contacts": contact_ids})
+
+
+@login_required
+def import_vcf(request):
+    if request.is_ajax() and request.method == "POST" and request.FILES:
+        file = request.FILES.get('vcf_file')
+        if file and file.name[-4:] in ['.vcf', '.csv']:
+            with file as f:
+                # import pdb
+                # pdb.set_trace()
+                vc = vobject.readComponents(f.read().decode("utf-8"))
+                vo = next(vc, None)
+                while vo is not None:
+                    # vo.prettyPrint()
+                    fname = vo.contents.get('fn')[0].value
+                    email = vo.contents.get('email')[0].value if vo.contents.get('email') else ''
+                    numbers = []
+                    if vo.contents.get('tel'):
+                        for v in vo.contents['tel']:
+                            no = v.value.replace("-", "")
+                            if no not in numbers and no[-10:] not in numbers[-10:]:
+                                numbers.append(no)
+                    print(fname, ', ', numbers, ', ', email)
+                    vo = next(vc, None)
+                    # TODO: Bulk creation and code optimization
+                    contact = Contact.objects.create(fname=fname, email=email)
+                    if numbers:
+                        for number in numbers:
+                            ContactNo.objects.create(number=number, number_type='mobile', contact_id=contact)
+
+            return redirect("phone_book:contact_details")
+
+        else:
+            return JsonResponse({'success': False, 'message': 'Only vcf or csv files are allowed'})
+    else:
+        return JsonResponse({'success': False})
 
 
 def contact_data(request):
@@ -170,5 +217,3 @@ def contact_data(request):
 
     return render(request, 'phonebook/contact_data.html', {'contacts': contact_data, 'contact_form': contact_form,
                                                            'contact_no_form': contact_no_form})
-
-

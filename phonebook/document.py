@@ -16,7 +16,7 @@ class ContactDocument(Document):
 
     class Django:
         model = Contact
-        fields = ['fname', 'lname', 'email', 'bdate', 'company_name', 'website', 'is_favourite']
+        fields = ['id', 'fname', 'lname', 'email', 'bdate', 'company_name', 'website', 'is_favourite']
         related_models = [ContactNo]
 
     def get_instances_from_related(self, related_instance):
