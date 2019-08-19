@@ -14,7 +14,7 @@ $(document).ready(function(){
     });
 
     div_btn_multi = $("#contact_table_wrapper").children().first().children().first();
-    div_btn_multi.append("<button class='btn btn-warning btn-sm' id='btn_dlt_multi' hidden>Delete Selected</button>");
+    div_btn_multi.append("<button class='btn btn-danger btn-sm' id='btn_dlt_multi' hidden>Delete Selected</button>");
 
     select_all = $(".sorting_asc")
     select_all.first().html("<input type='checkbox' id='select-all-check'>")

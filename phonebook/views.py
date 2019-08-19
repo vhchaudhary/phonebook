@@ -149,8 +149,6 @@ def import_vcf(request):
         file = request.FILES.get('vcf_file')
         if file and file.name[-4:] in ['.vcf', '.csv']:
             with file as f:
-                # import pdb
-                # pdb.set_trace()
                 vc = vobject.readComponents(f.read().decode("utf-8"))
                 vo = next(vc, None)
                 while vo is not None:

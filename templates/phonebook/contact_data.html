@@ -32,11 +32,17 @@
                     <div class="col-md-12">
                         <button class="btn btn-info btn-sm" data-target="#modal_contact" data-toggle="modal">
                             Create New
-                        </button> <br/><br/>
-                    </div>
+                        </button>
+                    </div><br/><br/>
+                    <div class="col-md-12">
+                        <button class="btn btn-info btn-sm">
+                            Synchronize
+                        </button>
+
+                    </div><br/><br/>
                     <div class="col-md-12">
                         <button class="btn btn-info btn-sm" data-target="#modal_imp_contact" data-toggle="modal">
-                            Import Contacts
+                            Import
                         </button>
                     </div>
                 </div>
@@ -131,7 +137,7 @@
                                  {% csrf_token %}
                                  <div id="form-group">
                                      <label for="vcf_file">
-                                         <input type="file" name="vcf_file" id="vcf_file" accept=".csv,.vcf" class="form-control" required/>
+                                         <input type="file" name="vcf_file" id="vcf_file" accept=".csv,.vcf" required/>
                                      </label>
                                      <input type="submit" class="btn btn-success btn-sm" value="Import"/>
                                  </div>
