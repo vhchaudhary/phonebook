@@ -13,6 +13,12 @@ createsuperuser
 > python manage.py createsuperuser
 
 
+Authentication
+---------
+> You have to add your own client id and secret in settings.py for google and linked in authentication.
+
+
+
 Migrations
 ----------
 You need to migrate code after create or modify existing or new models
