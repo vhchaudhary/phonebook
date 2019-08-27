@@ -1,0 +1,9 @@
+### Don't track content of these folders
+**/migrations/**
+**/__pycache__/**
+**/.idea/**
+
+### Python artifacts
+*.pyc
+db.sqlite3
+vcards_test.vcf

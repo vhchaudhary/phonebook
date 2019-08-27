@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django_countries.fields import CountryField
 from django_extensions.db.models import TimeStampedModel
@@ -12,6 +13,7 @@ class Contact(TimeStampedModel):
     website = models.CharField(max_length=50, null=True, blank=True)
     bdate = models.DateField(null=True, verbose_name='Birth Date', blank=True)
     is_favourite = models.BooleanField(default=False, verbose_name='Favourite')
+    user_id = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.fname

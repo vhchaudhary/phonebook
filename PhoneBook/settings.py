@@ -63,6 +63,9 @@ MIDDLEWARE = [
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = ''
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = ''
 
+SOCIAL_AUTH_FACEBOOK_KEY = ''
+SOCIAL_AUTH_FACEBOOK_SECRET = ''
+
 SOCIAL_AUTH_LINKEDIN_KEY = ''
 SOCIAL_AUTH_LINKEDIN_SECRET = ''
 
@@ -72,7 +75,8 @@ LOGOUT_URL = '/logins/'
 
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.google.GoogleOAuth2',
-    # 'social.backends.linkedin.LinkedinOAuth2',
+    'social_core.backends.facebook.FacebookOAuth2',
+    'social.backends.linkedin.LinkedinOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
 
