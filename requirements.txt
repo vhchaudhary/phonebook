@@ -6,3 +6,4 @@ django-elasticsearch-dsl==6.4.2
 django-extensions==2.1.9
 django-import-export==1.2.0
 social-auth-app-django==3.1.0
+reportlab

@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'social_django',
     'django_elasticsearch_dsl',
-    'behaviors.apps.BehaviorsConfig',
+    'import_export',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -60,11 +60,11 @@ MIDDLEWARE = [
 # SOCIAL_AUTH_URL_NAMESPACE = 'social'
 
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = ''
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = ''
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '634544027010-kcu8rd7ecg2paqfbie1cne7il5d3vghi.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'YRsCIRQz3BEHgbSjcnxMB7bT'
 
-SOCIAL_AUTH_FACEBOOK_KEY = ''
-SOCIAL_AUTH_FACEBOOK_SECRET = ''
+SOCIAL_AUTH_FACEBOOK_KEY = '2351421088273401'
+SOCIAL_AUTH_FACEBOOK_SECRET = '3b85e805b05ab161baf5bf6cc9ccb01d'
 
 SOCIAL_AUTH_LINKEDIN_KEY = ''
 SOCIAL_AUTH_LINKEDIN_SECRET = ''
@@ -76,7 +76,7 @@ LOGOUT_URL = '/logins/'
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.google.GoogleOAuth2',
     'social_core.backends.facebook.FacebookOAuth2',
-    'social.backends.linkedin.LinkedinOAuth2',
+    # 'social.backends.linkedin.LinkedinOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
 
@@ -136,6 +136,16 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_USE_TLS = True
+# EMAIL_HOST = '127.0.0.1'
+# EMAIL_PORT = 1025
+EMAIL_HOST_USER = 'vh.chaudhari@ia.ooo'
+# EMAIL_HOST_PASSWORD = ''
 
 
 # Internationalization

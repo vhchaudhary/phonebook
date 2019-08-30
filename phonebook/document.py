@@ -3,7 +3,7 @@ from django_elasticsearch_dsl.registries import registry
 from .models import *
 
 
-@registry.register_document
+# @registry.register_document
 class ContactDocument(Document):
     number_ids = fields.NestedField(properties={
         'number': fields.TextField(),

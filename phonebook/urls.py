@@ -13,4 +13,6 @@ urlpatterns = [
     path('update/<int:pk>', ContactUpdate.as_view(), name='contact_update'),
     path('delete_multi/', delete_multi, name='delete_multi'),
     path('import_vcf/', import_vcf, name='import_vcf'),
+    path('report_lab/pdf/', write_pdf_view, name='report'),
+    path('report/pdf/', html_to_pdf_view, name='report'),
 ]

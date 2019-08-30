@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import *
+from import_export.admin import ImportExportModelAdmin
 
 
 # override admin.Tablularline for diplay multiple numbers, you can also use StackedInline
@@ -8,7 +9,7 @@ class ContactNoInline(admin.TabularInline):
 
 
 # ModelAdmin provide basic customization to admin like searching, listing, filtering etc...
-class ContactAdmin(admin.ModelAdmin):
+class ContactAdmin(ImportExportModelAdmin):
     list_display = ['fname', 'lname', 'bdate', 'is_favourite']
     inlines = [ContactNoInline]
 
@@ -16,7 +17,7 @@ class ContactAdmin(admin.ModelAdmin):
         if not obj.pk:
             # Only set added_by during the first save.
             obj.user_id = request.user
-        self.super(ContactAdmin, self).save_model(request, obj, form, change)
+        super(ContactAdmin, self).save_model(request, obj, form, change)
 
 
 admin.site.register(Contact, ContactAdmin)

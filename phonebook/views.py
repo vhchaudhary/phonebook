@@ -1,15 +1,70 @@
+from io import BytesIO
 
 import vobject
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render, redirect
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.generic import CreateView, UpdateView
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import inch
+from reportlab.pdfgen import canvas
+from reportlab.platypus import SimpleDocTemplate, Spacer, Paragraph
+import weasyprint
 from .forms import *
 from django.db import transaction
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .document import *
+
+
+def html_to_pdf_view(request):
+    contacts = Contact.objects.all()
+    contact_data = [
+        {
+            'id': c.id,
+            'name': c.fname + ' ' + (c.lname if c.lname else ''),
+            'email': c.email if c.email else '-',
+            'is_favourite': c.is_favourite,
+            'ph_numbers': [cn.number for cn in ContactNo.objects.filter(contact_id=c.id)]
+        }
+        for c in contacts
+    ]
+
+    html_string = render_to_string('phonebook/report.html', {'data': contact_data})
+
+    html = weasyprint.HTML(string=html_string)
+    html.write_pdf(target='/tmp/mypdf.pdf')
+
+    fs = FileSystemStorage('/tmp')
+    with fs.open('mypdf.pdf') as pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="mypdf.pdf"'
+        return response
+
+    return response
+
+
+def write_pdf_view(request):
+    doc = SimpleDocTemplate("/tmp/somefilename.pdf")
+    styles = getSampleStyleSheet()
+    Story = [Spacer(1, 2 * inch)]
+    style = styles["Normal"]
+    for i in range(100):
+        bogustext = ("This is Paragraph number %s.  " % i) * 20
+        p = Paragraph(bogustext, style)
+        Story.append(p)
+        Story.append(Spacer(1, 0.2 * inch))
+    doc.build(Story)
+
+    fs = FileSystemStorage("/tmp")
+    with fs.open("somefilename.pdf") as pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="somefilename.pdf"'
+        return response
+
+    return response
 
 
 class ContactDetails(LoginRequiredMixin, CreateView):
@@ -20,7 +75,8 @@ class ContactDetails(LoginRequiredMixin, CreateView):
     login_url = '/logins/'
 
     def get_context_data(self, **kwargs):
-        contacts = ContactDocument.search(index='contacts').scan()
+        # contacts = ContactDocument.search(index='contacts').scan()
+        contacts = Contact.objects.all()
         contact_data = [
             {
                 'id': c.id,
